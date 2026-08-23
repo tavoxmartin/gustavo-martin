@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+:root {
+  --color-bg: #ffffff;
+  --color-ink: #1a1a1a;
+  --color-muted: #6e6e70;
+  --color-card: #f7f7f8;
+  --color-border: #e4e4e7;
+  --color-lav: #dcd3f7;
+  --color-lav-ink: #3a3070;
+}
+
+@layer base {
+  html,
+  body {
+    height: 100%;
+  }
+
+  .font-heading {
+    font-family: var(--font-plus-jakarta-sans), "Plus Jakarta Sans", system-ui, sans-serif;
+  }
+
+  .font-label {
+    font-family: var(--font-ibm-plex-mono), "IBM Plex Mono", monospace;
+  }
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+}
