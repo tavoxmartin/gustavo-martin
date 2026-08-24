@@ -1,3 +1,6 @@
+import { supabase, type Article } from "@/lib/supabase";
+import { SubscribeForm } from "@/app/components/SubscribeForm";
+
 const metrics = [
   { label: "LECTORES", value: "300" },
   { label: "LO LEEN", value: "62 %" },
@@ -5,34 +8,33 @@ const metrics = [
   { label: "COMENTARIOS", value: "31" },
 ];
 
-const previousIssues = [
-  {
-    label: "01 — RADAR DE IMPACTO",
-    title: "El arábica en máximos: qué hacer con tu carta este trimestre",
-    body: "Tres decisiones de precio que puedes tomar ahora sin tocar la calidad de taza.",
-    date: "05 AGO 2026",
-  },
-  {
-    label: "02 — ORIGEN",
-    title: "Colombia después de la lluvia: qué esperar de la próxima cosecha",
-    body: "Cómo leer los partes de clima antes de que se muevan los diferenciales.",
-    date: "22 JUL 2026",
-  },
-  {
-    label: "03 — DESARROLLO",
-    title: "Tu tueste no es el problema, tu compra sí",
-    body: "Por qué el margen se decide en la mesa de negociación y no en el tambor.",
-    date: "09 JUL 2026",
-  },
-  {
-    label: "04 — SEGUNDO CRACK",
-    title: "Especialidad sin sobreprecio: dónde deja de pagar el cliente",
-    body: "El techo real de precio en barra y cómo encontrarlo sin perder recurrencia.",
-    date: "30 JUN 2026",
-  },
-];
+function formatIssueDate(dateStr: string) {
+  return new Intl.DateTimeFormat("es", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  })
+    .format(new Date(`${dateStr}T00:00:00`))
+    .replace(".", "")
+    .toUpperCase();
+}
 
-export default function Home() {
+async function getArticles(): Promise<(Article & { edition: number })[]> {
+  const { data, error } = await supabase
+    .from("articles")
+    .select("*")
+    .order("date", { ascending: true });
+
+  if (error || !data) return [];
+
+  return data.map((article, i) => ({ ...article, edition: i + 1 }));
+}
+
+export default async function Home() {
+  const articles = await getArticles();
+  const newestFirst = [...articles].reverse();
+  const [latestIssue, ...previousIssues] = newestFirst;
+
   return (
     <div className="mx-auto flex w-full max-w-[1440px] flex-col overflow-hidden">
       <header className="flex w-full items-center justify-between px-6 py-6 sm:px-12 lg:px-[180px] lg:py-[26px]">
@@ -77,55 +79,58 @@ export default function Home() {
           Escribo para quienes tienen que tomar decisiones dentro del mundo del café
         </h2>
 
-        <article className="mt-[26px] w-full rounded-[20px] bg-[var(--color-card)] p-6 outline outline-[var(--color-border)] -outline-offset-1 lg:p-[26px]">
-          <div className="flex flex-col justify-between gap-2 border-b border-[var(--color-border)] pb-[18px] sm:flex-row sm:items-center">
-            <span className="font-label text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
-              EL PRIMER CRACK · EDICIÓN #0
-            </span>
-            <span className="font-label text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
-              26 AGO 2026 · EDICIÓN 000
-            </span>
-          </div>
+        {latestIssue && (
+          <article className="mt-[26px] w-full rounded-[20px] bg-[var(--color-card)] p-6 outline outline-[var(--color-border)] -outline-offset-1 lg:p-[26px]">
+            <div className="flex flex-col justify-between gap-2 border-b border-[var(--color-border)] pb-[18px] sm:flex-row sm:items-center">
+              <span className="font-label text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
+                {latestIssue.title}
+              </span>
+              <span className="font-label text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
+                {formatIssueDate(latestIssue.date)} · EDICIÓN{" "}
+                {String(latestIssue.edition).padStart(3, "0")}
+              </span>
+            </div>
 
-          <div className="mt-[22px] grid grid-cols-2 gap-[10px] sm:grid-cols-4">
-            {metrics.map((m) => (
-              <div
-                key={m.label}
-                className={`flex flex-col gap-[7px] rounded-[12px] p-[16px_18px] ${
-                  m.highlight ? "bg-[var(--color-lav)]" : ""
-                }`}
-              >
-                <span
-                  className={`font-label text-[11px] tracking-[2px] whitespace-nowrap ${
-                    m.highlight ? "text-[var(--color-lav-ink)]" : "text-[var(--color-muted)]"
+            <div className="mt-[22px] grid grid-cols-2 gap-[10px] sm:grid-cols-4">
+              {metrics.map((m) => (
+                <div
+                  key={m.label}
+                  className={`flex flex-col gap-[7px] rounded-[12px] p-[16px_18px] ${
+                    m.highlight ? "bg-[var(--color-lav)]" : ""
                   }`}
                 >
-                  {m.label}
-                </span>
-                <span
-                  className={`text-[25px] font-semibold tracking-[-0.8px] whitespace-nowrap ${
-                    m.highlight ? "text-[var(--color-lav-ink)]" : "text-[var(--color-ink)]"
-                  }`}
-                >
-                  {m.value}
-                </span>
-              </div>
-            ))}
-          </div>
+                  <span
+                    className={`font-label text-[11px] tracking-[2px] whitespace-nowrap ${
+                      m.highlight ? "text-[var(--color-lav-ink)]" : "text-[var(--color-muted)]"
+                    }`}
+                  >
+                    {m.label}
+                  </span>
+                  <span
+                    className={`text-[25px] font-semibold tracking-[-0.8px] whitespace-nowrap ${
+                      m.highlight ? "text-[var(--color-lav-ink)]" : "text-[var(--color-ink)]"
+                    }`}
+                  >
+                    {m.value}
+                  </span>
+                </div>
+              ))}
+            </div>
 
-          <p className="mt-[22px] max-w-[620px] text-[16px] leading-[26px] text-[var(--color-muted)]">
-            Tres señales para entender qué está moviendo el café esta semana.
-          </p>
+            <p className="mt-[22px] max-w-[620px] text-[16px] leading-[26px] text-[var(--color-muted)]">
+              {latestIssue.excerpt}
+            </p>
 
-          <a
-            href="#"
-            className="mt-5 inline-block w-fit border-b border-[var(--color-ink)] pb-[7px]"
-          >
-            <span className="font-label text-[11px] tracking-[2px] whitespace-nowrap">
-              LEER →
-            </span>
-          </a>
-        </article>
+            <a
+              href={`/articulos/${latestIssue.slug}`}
+              className="mt-5 inline-block w-fit border-b border-[var(--color-ink)] pb-[7px]"
+            >
+              <span className="font-label text-[11px] tracking-[2px] whitespace-nowrap">
+                LEER →
+              </span>
+            </a>
+          </article>
+        )}
       </section>
 
       <section className="flex w-full flex-col px-6 pb-16 sm:px-12 lg:px-[180px] lg:pb-[88px]">
@@ -140,22 +145,25 @@ export default function Home() {
         <ul className="mt-[30px] flex flex-col">
           {previousIssues.map((issue) => (
             <li
-              key={issue.label}
+              key={issue.slug}
               className="flex flex-col gap-3 border-t border-[var(--color-border)] py-[22px] sm:flex-row sm:gap-10"
             >
               <span className="font-label w-full pt-1 text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)] sm:w-[200px] sm:shrink-0">
-                {issue.label}
+                EDICIÓN #{String(issue.edition).padStart(3, "0")}
               </span>
-              <div className="flex flex-1 flex-col gap-[6px]">
+              <a
+                href={`/articulos/${issue.slug}`}
+                className="flex flex-1 flex-col gap-[6px]"
+              >
                 <p className="text-[17px] leading-[23px] font-semibold tracking-[-0.3px]">
                   {issue.title}
                 </p>
                 <p className="text-[16px] leading-[26px] text-[var(--color-muted)]">
-                  {issue.body}
+                  {issue.excerpt}
                 </p>
-              </div>
+              </a>
               <span className="font-label pt-1 text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)] sm:w-[120px] sm:shrink-0 sm:text-right">
-                {issue.date}
+                {formatIssueDate(issue.date)}
               </span>
             </li>
           ))}
@@ -179,20 +187,7 @@ export default function Home() {
             borrarte cuando quieras.
           </p>
 
-          <form className="mt-7 flex flex-col gap-[10px] sm:flex-row sm:items-center">
-            <input
-              type="email"
-              required
-              placeholder="tu correo"
-              className="w-full rounded-[10px] bg-white px-5 py-[15px] text-[15px] text-[var(--color-muted)] placeholder:text-[var(--color-muted)] focus:outline-2 focus:outline-[var(--color-lav-ink)] sm:w-[400px]"
-            />
-            <button
-              type="submit"
-              className="w-fit rounded-[10px] bg-[var(--color-lav-ink)] px-[30px] py-4 text-[15px] font-semibold whitespace-nowrap text-white hover:opacity-90"
-            >
-              suscribirme
-            </button>
-          </form>
+          <SubscribeForm />
 
           <p className="font-label mt-[22px] max-w-[560px] text-[11px] leading-[18px] opacity-[0.77]">
             Solo uso tu dirección de correo para el newsletter. Nada más.
