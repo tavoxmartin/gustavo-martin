@@ -12,4 +12,5 @@ export type Article = {
   content: string | null;
   date: string;
   slug: string;
+  edition: string;
 };

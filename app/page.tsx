@@ -19,7 +19,7 @@ function formatIssueDate(dateStr: string) {
     .toUpperCase();
 }
 
-async function getArticles(): Promise<(Article & { edition: number })[]> {
+async function getArticles(): Promise<Article[]> {
   const { data, error } = await supabase
     .from("articles")
     .select("*")
@@ -27,13 +27,26 @@ async function getArticles(): Promise<(Article & { edition: number })[]> {
 
   if (error || !data) return [];
 
-  return data.map((article, i) => ({ ...article, edition: i + 1 }));
+  return data;
+}
+
+function groupByEdition(issues: Article[]): [string, Article[]][] {
+  const groups = new Map<string, Article[]>();
+
+  for (const issue of issues) {
+    const group = groups.get(issue.edition);
+    if (group) group.push(issue);
+    else groups.set(issue.edition, [issue]);
+  }
+
+  return [...groups.entries()];
 }
 
 export default async function Home() {
   const articles = await getArticles();
   const newestFirst = [...articles].reverse();
   const [latestIssue, ...previousIssues] = newestFirst;
+  const editionGroups = groupByEdition(previousIssues);
 
   return (
     <div className="mx-auto flex w-full max-w-[1440px] flex-col overflow-hidden">
@@ -86,8 +99,7 @@ export default async function Home() {
                 {latestIssue.title}
               </span>
               <span className="font-label text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
-                {formatIssueDate(latestIssue.date)} · EDICIÓN{" "}
-                {String(latestIssue.edition).padStart(3, "0")}
+                {formatIssueDate(latestIssue.date)} · {latestIssue.edition.toUpperCase()}
               </span>
             </div>
 
@@ -142,32 +154,38 @@ export default async function Home() {
           <span className="text-[var(--color-muted)]">Conocerás el porqué del hoy.</span>
         </h2>
 
-        <ul className="mt-[30px] flex flex-col">
-          {previousIssues.map((issue) => (
-            <li
-              key={issue.slug}
-              className="flex flex-col gap-3 border-t border-[var(--color-border)] py-[22px] sm:flex-row sm:gap-10"
-            >
-              <span className="font-label w-full pt-1 text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)] sm:w-[200px] sm:shrink-0">
-                EDICIÓN #{String(issue.edition).padStart(3, "0")}
-              </span>
-              <a
-                href={`/articulos/${issue.slug}`}
-                className="flex flex-1 flex-col gap-[6px]"
-              >
-                <p className="text-[17px] leading-[23px] font-semibold tracking-[-0.3px]">
-                  {issue.title}
-                </p>
-                <p className="text-[16px] leading-[26px] text-[var(--color-muted)]">
-                  {issue.excerpt}
-                </p>
-              </a>
-              <span className="font-label pt-1 text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)] sm:w-[120px] sm:shrink-0 sm:text-right">
-                {formatIssueDate(issue.date)}
-              </span>
-            </li>
+        <div className="mt-[38px] flex flex-col gap-[46px]">
+          {editionGroups.map(([edition, issues]) => (
+            <div key={edition} className="flex flex-col">
+              <h3 className="font-label text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
+                {edition.toUpperCase()}
+              </h3>
+              <ul className="mt-[14px] flex flex-col">
+                {issues.map((issue) => (
+                  <li
+                    key={issue.slug}
+                    className="flex flex-col gap-3 border-t border-[var(--color-border)] py-[22px] sm:flex-row sm:gap-10"
+                  >
+                    <a
+                      href={`/articulos/${issue.slug}`}
+                      className="flex flex-1 flex-col gap-[6px]"
+                    >
+                      <p className="text-[17px] leading-[23px] font-semibold tracking-[-0.3px]">
+                        {issue.title}
+                      </p>
+                      <p className="text-[16px] leading-[26px] text-[var(--color-muted)]">
+                        {issue.excerpt}
+                      </p>
+                    </a>
+                    <span className="font-label pt-1 text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)] sm:w-[120px] sm:shrink-0 sm:text-right">
+                      {formatIssueDate(issue.date)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </ul>
+        </div>
       </section>
 
       <section className="flex w-full flex-col px-6 pb-20 sm:px-12 lg:px-[180px] lg:pb-20">
