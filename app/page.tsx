@@ -23,6 +23,7 @@ async function getArticles(): Promise<Article[]> {
   const { data, error } = await supabase
     .from("articles")
     .select("*")
+    .order("issue_number", { ascending: true })
     .order("date", { ascending: true });
 
   if (error || !data) return [];
@@ -30,23 +31,23 @@ async function getArticles(): Promise<Article[]> {
   return data;
 }
 
-function groupByEdition(issues: Article[]): [string, Article[]][] {
-  const groups = new Map<string, Article[]>();
+function groupByIssueNumber(issues: Article[]): [number, Article[]][] {
+  const groups = new Map<number, Article[]>();
 
   for (const issue of issues) {
-    const group = groups.get(issue.edition);
+    const group = groups.get(issue.issue_number);
     if (group) group.push(issue);
-    else groups.set(issue.edition, [issue]);
+    else groups.set(issue.issue_number, [issue]);
   }
 
-  return [...groups.entries()];
+  return [...groups.entries()].sort(([a], [b]) => b - a);
 }
 
 export default async function Home() {
   const articles = await getArticles();
   const newestFirst = [...articles].reverse();
   const [latestIssue, ...previousIssues] = newestFirst;
-  const editionGroups = groupByEdition(previousIssues);
+  const issueGroups = groupByIssueNumber(previousIssues);
 
   return (
     <div className="mx-auto flex w-full max-w-[1440px] flex-col overflow-hidden">
@@ -89,17 +90,17 @@ export default async function Home() {
           EL PRIMER CRACK · SEGUNDO CRACK · DESARROLLO · ORIGEN · RADAR DE IMPACTO
         </span>
         <h2 className="mt-4 text-[24px] leading-[1.2] font-semibold tracking-[-0.9px] sm:text-[31px] sm:leading-[35px]">
-          Escribo para quienes tienen que tomar decisiones dentro del mundo del café
+          Escribo para quienes toman decisiones dentro del mundo del café
         </h2>
 
         {latestIssue && (
           <article className="mt-[26px] w-full rounded-[20px] bg-[var(--color-card)] p-6 outline outline-[var(--color-border)] -outline-offset-1 lg:p-[26px]">
             <div className="flex flex-col justify-between gap-2 border-b border-[var(--color-border)] pb-[18px] sm:flex-row sm:items-center">
               <span className="font-label text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
-                {latestIssue.title}
+                ÚLTIMA EDICIÓN
               </span>
               <span className="font-label text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
-                {formatIssueDate(latestIssue.date)} · {latestIssue.edition.toUpperCase()}
+                EDICIÓN {latestIssue.issue_number} · {formatIssueDate(latestIssue.date)}
               </span>
             </div>
 
@@ -129,7 +130,15 @@ export default async function Home() {
               ))}
             </div>
 
-            <p className="mt-[22px] max-w-[620px] text-[16px] leading-[26px] text-[var(--color-muted)]">
+            <span className="font-label mt-[30px] block text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
+              {latestIssue.category.toUpperCase()}
+            </span>
+
+            <h2 className="mt-[8px] max-w-[720px] text-[28px] leading-[1.15] font-bold tracking-[-1px] sm:text-[34px] sm:leading-[1.12] sm:tracking-[-1.3px]">
+              {latestIssue.title}
+            </h2>
+
+            <p className="mt-[14px] max-w-[620px] text-[16px] leading-[26px] text-[var(--color-muted)]">
               {latestIssue.excerpt}
             </p>
 
@@ -155,10 +164,10 @@ export default async function Home() {
         </h2>
 
         <div className="mt-[38px] flex flex-col gap-[46px]">
-          {editionGroups.map(([edition, issues]) => (
-            <div key={edition} className="flex flex-col">
+          {issueGroups.map(([issueNumber, issues]) => (
+            <div key={issueNumber} className="flex flex-col">
               <h3 className="font-label text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
-                {edition.toUpperCase()}
+                EDICIÓN {issueNumber}
               </h3>
               <ul className="mt-[14px] flex flex-col">
                 {issues.map((issue) => (
@@ -170,6 +179,9 @@ export default async function Home() {
                       href={`/articulos/${issue.slug}`}
                       className="flex flex-1 flex-col gap-[6px]"
                     >
+                      <span className="font-label text-[10px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
+                        {issue.category.toUpperCase()}
+                      </span>
                       <p className="text-[17px] leading-[23px] font-semibold tracking-[-0.3px]">
                         {issue.title}
                       </p>

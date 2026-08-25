@@ -5,6 +5,13 @@ export const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
+export type ArticleCategory =
+  | "El Primer Crack"
+  | "Segundo Crack"
+  | "Desarrollo"
+  | "Origen"
+  | "Radar de Impacto";
+
 export type Article = {
   id: string;
   title: string;
@@ -12,5 +19,6 @@ export type Article = {
   content: string | null;
   date: string;
   slug: string;
-  edition: string;
+  category: ArticleCategory;
+  issue_number: number;
 };
