@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { supabase, type Article } from "@/lib/supabase";
 import { SubscribeForm } from "@/app/components/SubscribeForm";
 
@@ -52,9 +53,12 @@ export default async function Home() {
   return (
     <div className="mx-auto flex w-full max-w-[1440px] flex-col overflow-hidden">
       <header className="flex w-full items-center justify-between px-6 py-6 sm:px-12 lg:px-[180px] lg:py-[26px]">
-        <span className="text-[17px] font-semibold tracking-[-0.5px] whitespace-nowrap">
-          gustavo martin
-        </span>
+        <Image
+          src="/hero-icon.jpg" 
+          alt="gustavo Martin"
+          width={256}
+          height={256}
+        />
         <a
           href="#suscribirte"
           className="font-label text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)] hover:text-[var(--color-ink)]"
