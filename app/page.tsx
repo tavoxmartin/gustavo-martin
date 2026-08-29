@@ -260,7 +260,10 @@ export default async function Home() {
             <span className="font-label text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
               GUSTAVO
             </span>
-            <a href="#" className="text-[15px] whitespace-nowrap hover:underline">
+            <a
+              href="/contacto"
+              className="text-[15px] whitespace-nowrap hover:underline"
+            >
               Contacto
             </a>
             <a href="#" className="text-[15px] whitespace-nowrap hover:underline">
