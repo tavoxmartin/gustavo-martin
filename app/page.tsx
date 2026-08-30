@@ -266,7 +266,10 @@ export default async function Home() {
             >
               Contacto
             </a>
-            <a href="#" className="text-[15px] whitespace-nowrap hover:underline">
+            <a
+              href="/acerca-de-mi"
+              className="text-[15px] whitespace-nowrap hover:underline"
+            >
               Acerca de mi
             </a>
           </div>
