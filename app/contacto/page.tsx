@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -32,11 +33,13 @@ export default function ContactoPage() {
   return (
     <div className="mx-auto flex w-full max-w-[1440px] flex-col overflow-hidden">
       <header className="flex w-full items-center justify-between px-6 py-6 sm:px-12 lg:px-[180px] lg:py-[26px]">
-        <Link
-          href="/"
-          className="text-[17px] font-semibold tracking-[-0.5px] whitespace-nowrap"
-        >
-          gustavo martin
+        <Link href="/" className="shrink-0">
+          <Image
+            src="/hero-icon.jpg"
+            alt="Gustavo Martin"
+            width={256}
+            height={256}
+          />
         </Link>
         <Link
           href="/#suscribirte"

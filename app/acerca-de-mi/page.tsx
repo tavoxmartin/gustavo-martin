@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 export const metadata: Metadata = {
@@ -19,11 +20,13 @@ export default function AcercaDeMiPage() {
   return (
     <div className="mx-auto flex w-full max-w-[1440px] flex-col overflow-hidden">
       <header className="flex w-full items-center justify-between px-6 py-6 sm:px-12 lg:px-[180px] lg:py-[26px]">
-        <Link
-          href="/"
-          className="text-[17px] font-semibold tracking-[-0.5px] whitespace-nowrap"
-        >
-          gustavo martin
+        <Link href="/" className="shrink-0">
+          <Image
+            src="/hero-icon.jpg"
+            alt="Gustavo Martin"
+            width={256}
+            height={256}
+          />
         </Link>
         <Link
           href="/#suscribirte"
@@ -41,13 +44,23 @@ export default function AcercaDeMiPage() {
           ← VOLVER
         </Link>
 
-        <span className="font-label mt-8 text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
-          ACERCA DE MÍ
-        </span>
+        <div className="mt-8 flex flex-col-reverse gap-6 sm:flex-row sm:items-start sm:justify-between sm:gap-10">
+          <div className="flex flex-col">
+            <span className="font-label text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
+              ACERCA DE MÍ
+            </span>
 
-        <h1 className="mt-[18px] max-w-[905px] text-[32px] leading-[1.12] font-semibold tracking-[-1.1px] sm:text-[42px] sm:leading-[1.1] sm:tracking-[-1.6px]">
-          Trabajo donde el café de origen se encuentra con el mercado
-        </h1>
+            <h1 className="mt-[18px] max-w-[905px] text-[32px] leading-[1.12] font-semibold tracking-[-1.1px] sm:text-[42px] sm:leading-[1.1] sm:tracking-[-1.6px]">
+              Trabajo donde el café de origen se encuentra con el mercado
+            </h1>
+          </div>
+
+          <div className="flex h-[140px] w-[140px] shrink-0 flex-col items-center justify-center gap-2 self-center rounded-[20px] bg-[var(--color-card)] outline outline-[var(--color-border)] -outline-offset-1 sm:self-auto lg:h-[180px] lg:w-[180px]">
+            <span className="font-label text-center text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
+              FOTO
+            </span>
+          </div>
+        </div>
 
         <div className="mt-10 flex max-w-[680px] flex-col gap-5 border-t border-[var(--color-border)] pt-10 text-[17px] leading-[28px]">
           <p>
