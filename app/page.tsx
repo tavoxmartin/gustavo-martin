@@ -90,7 +90,7 @@ export default async function Home() {
       </section>
 
       <section className="flex w-full flex-col px-6 pb-16 sm:px-12 lg:px-[180px] lg:pb-[88px]">
-        <span className="font-label text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
+        <span className="font-label text-[11px] tracking-[2px] text-[var(--color-muted)] sm:whitespace-nowrap">
           EL PRIMER CRACK · SEGUNDO CRACK · DESARROLLO · ORIGEN · RADAR DE IMPACTO
         </span>
         <h2 className="mt-4 text-[24px] leading-[1.2] font-semibold tracking-[-0.9px] sm:text-[31px] sm:leading-[35px]">
