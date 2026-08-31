@@ -21,4 +21,5 @@ export type Article = {
   slug: string;
   category: ArticleCategory;
   issue_number: number;
+  notified: boolean;
 };

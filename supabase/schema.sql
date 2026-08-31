@@ -11,8 +11,16 @@ create table if not exists public.articles (
   category text not null default 'El Primer Crack'
     check (category in ('El Primer Crack', 'Segundo Crack', 'Desarrollo', 'Origen', 'Radar de Impacto')),
   issue_number integer not null,
+  -- Set true once the weekly digest for this article's issue_number has been
+  -- emailed to subscribers, so the cron job never sends an edition twice.
+  notified boolean not null default false,
   created_at timestamptz not null default now()
 );
+
+-- Migration for databases created before the "notified" column existed.
+-- Safe to re-run.
+alter table public.articles
+  add column if not exists notified boolean not null default false;
 
 -- Migration for databases that already have the articles table from before
 -- category/issue_number existed (i.e. still carry the old "edition" column).
