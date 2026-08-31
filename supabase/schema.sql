@@ -87,6 +87,8 @@ create policy "Public can read articles" on public.articles
   for select using (true);
 
 -- Anyone (anon key) can subscribe, but cannot read/update/delete subscribers.
+-- Unsubscribes go through /api/unsubscribe using the service-role key (which
+-- bypasses RLS), so no public delete policy is needed.
 create policy "Public can subscribe" on public.subscribers
   for insert with check (true);
 

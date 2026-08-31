@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { resend, FROM_EMAIL } from "@/lib/resend";
 import { buildDigestEmail, digestSubject } from "@/lib/digest-email";
+import { unsubscribeUrl, listUnsubscribeHeaders, siteUrl } from "@/lib/unsubscribe";
 
 const BATCH_SIZE = 100;
 
@@ -121,9 +122,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Failed to load subscribers" }, { status: 500 });
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gustavo-martin.com";
+  const site = siteUrl();
   const subject = digestSubject(issueNumber);
-  const { html, text } = buildDigestEmail(issueNumber, articles, siteUrl);
 
   if (!subscribers || subscribers.length === 0) {
     return NextResponse.json({
@@ -138,13 +138,22 @@ export async function GET(request: NextRequest) {
 
   for (const batch of batches) {
     const { error: sendError } = await resend.batch.send(
-      batch.map(({ email }) => ({
-        from: FROM_EMAIL,
-        to: email,
-        subject,
-        html,
-        text,
-      }))
+      batch.map(({ email }) => {
+        const { html, text } = buildDigestEmail(
+          issueNumber,
+          articles,
+          site,
+          unsubscribeUrl(email, site)
+        );
+        return {
+          from: FROM_EMAIL,
+          to: email,
+          subject,
+          html,
+          text,
+          headers: listUnsubscribeHeaders(email, site),
+        };
+      })
     );
 
     if (sendError) {

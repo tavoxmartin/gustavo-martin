@@ -84,7 +84,7 @@ function escapeHtml(value: string) {
     .replace(/>/g, "&gt;");
 }
 
-export function buildWelcomeEmail() {
+export function buildWelcomeEmail(unsubscribeUrl: string) {
   const paragraphs = WELCOME_LINES.map(
     (line) =>
       `<p style="margin: 0 0 14px; font-size: 16px; line-height: 1.6; color: #333;">${escapeHtml(
@@ -105,6 +105,10 @@ export function buildWelcomeEmail() {
       <p style="margin: 0; font-size: 14px;">
         <a href="${LAST_EDITION_URL}" style="color: #4b3f72;">gustavo-martin.com</a>
       </p>
+      <p style="margin: 24px 0 0; font-size: 12px; line-height: 1.6; color: #999;">
+        ¿No quieres estos correos?
+        <a href="${unsubscribeUrl}" style="color: #999;">Darse de baja</a>
+      </p>
     </div>
   `;
 
@@ -117,6 +121,8 @@ export function buildWelcomeEmail() {
     "",
     `Leer la última edición → ${LAST_EDITION_URL}`,
     "gustavo-martin.com",
+    "",
+    `Darse de baja: ${unsubscribeUrl}`,
   ].join("\n");
 
   return { html, text };

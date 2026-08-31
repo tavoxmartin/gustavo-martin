@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { resend, FROM_EMAIL } from "@/lib/resend";
+import { unsubscribeUrl, listUnsubscribeHeaders } from "@/lib/unsubscribe";
 
 const BATCH_SIZE = 100;
 
@@ -12,7 +13,7 @@ function chunk<T>(items: T[], size: number): T[][] {
   return chunks;
 }
 
-function buildEmail(articleTitle: string, articleUrl: string) {
+function buildEmail(articleTitle: string, articleUrl: string, unsubUrl: string) {
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
       <p style="font-size: 13px; letter-spacing: 1px; text-transform: uppercase; color: #666;">Gustavo Martin</p>
@@ -20,9 +21,13 @@ function buildEmail(articleTitle: string, articleUrl: string) {
       <p>
         <a href="${articleUrl}" style="color: #4b3f72;">Leer el artículo →</a>
       </p>
+      <p style="margin: 24px 0 0; font-size: 12px; line-height: 1.6; color: #999;">
+        ¿No quieres estos correos?
+        <a href="${unsubUrl}" style="color: #999;">Darse de baja</a>
+      </p>
     </div>
   `;
-  const text = `${articleTitle}\n\nLeer el artículo: ${articleUrl}`;
+  const text = `${articleTitle}\n\nLeer el artículo: ${articleUrl}\n\nDarse de baja: ${unsubUrl}`;
   return { html, text };
 }
 
@@ -65,19 +70,26 @@ export async function POST(request: NextRequest) {
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gustavo-martin.com";
   const articleUrl = `${siteUrl}/articulos/${article.slug}`;
-  const { html, text } = buildEmail(article.title, articleUrl);
 
   const batches = chunk(subscribers, BATCH_SIZE);
 
   for (const batch of batches) {
     const { error: sendError } = await resend.batch.send(
-      batch.map(({ email }) => ({
-        from: FROM_EMAIL,
-        to: email,
-        subject: article.title,
-        html,
-        text,
-      }))
+      batch.map(({ email }) => {
+        const { html, text } = buildEmail(
+          article.title,
+          articleUrl,
+          unsubscribeUrl(email, siteUrl)
+        );
+        return {
+          from: FROM_EMAIL,
+          to: email,
+          subject: article.title,
+          html,
+          text,
+          headers: listUnsubscribeHeaders(email, siteUrl),
+        };
+      })
     );
 
     if (sendError) {

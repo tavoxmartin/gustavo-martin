@@ -3,6 +3,7 @@
 import { supabase } from "@/lib/supabase";
 import { resend, FROM_EMAIL } from "@/lib/resend";
 import { WELCOME_SUBJECT, buildWelcomeEmail } from "@/lib/welcome-email";
+import { unsubscribeUrl, listUnsubscribeHeaders } from "@/lib/unsubscribe";
 
 export type SubscribeState = {
   status: "idle" | "success" | "error";
@@ -31,13 +32,14 @@ export async function subscribe(
     };
   }
 
-  const { html, text } = buildWelcomeEmail();
+  const { html, text } = buildWelcomeEmail(unsubscribeUrl(email));
   const { error: sendError } = await resend.emails.send({
     from: FROM_EMAIL,
     to: email,
     subject: WELCOME_SUBJECT,
     html,
     text,
+    headers: listUnsubscribeHeaders(email),
   });
 
   if (sendError) {

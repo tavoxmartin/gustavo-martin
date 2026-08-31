@@ -16,7 +16,8 @@ export function digestSubject(issueNumber: number) {
 export function buildDigestEmail(
   issueNumber: number,
   articles: DigestArticle[],
-  siteUrl: string
+  siteUrl: string,
+  unsubscribeUrl: string
 ) {
   const items = articles
     .map((article) => {
@@ -46,6 +47,10 @@ export function buildDigestEmail(
       <p style="margin: 28px 0 0; font-size: 14px;">
         <a href="${siteUrl}" style="color: #4b3f72;">gustavo-martin.com</a>
       </p>
+      <p style="margin: 20px 0 0; font-size: 12px; line-height: 1.6; color: #999;">
+        ¿No quieres estos correos?
+        <a href="${unsubscribeUrl}" style="color: #999;">Darse de baja</a>
+      </p>
     </div>
   `;
 
@@ -59,6 +64,8 @@ export function buildDigestEmail(
       "",
     ]),
     "gustavo-martin.com",
+    "",
+    `Darse de baja: ${unsubscribeUrl}`,
   ].join("\n");
 
   return { html, text };
