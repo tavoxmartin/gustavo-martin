@@ -73,6 +73,21 @@ begin
   end if;
 end $$;
 
+-- Per-edition intro/closing copy for the weekly digest email. Rows are
+-- optional: an edition with no row here just renders the article list with no
+-- intro or closing section.
+create table if not exists public.editions (
+  issue_number integer primary key,
+  intro_text text,
+  closing_text text
+);
+
+alter table public.editions enable row level security;
+
+-- Anyone (anon key) can read edition copy.
+create policy "Public can read editions" on public.editions
+  for select using (true);
+
 create table if not exists public.subscribers (
   id uuid primary key default gen_random_uuid(),
   email text not null unique,

@@ -88,6 +88,18 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  // Optional intro/closing copy for this edition. Missing row is fine — the
+  // email just renders the article list without those sections.
+  const { data: edition, error: editionError } = await supabaseAdmin
+    .from("editions")
+    .select("intro_text, closing_text")
+    .eq("issue_number", issueNumber)
+    .maybeSingle();
+
+  if (editionError) {
+    return NextResponse.json({ error: "Failed to load edition copy" }, { status: 500 });
+  }
+
   // Atomic claim: flip every not-yet-notified row of this edition in one
   // statement and see what we got. If nothing comes back, another run already
   // sent this edition — bail before emailing anyone.
@@ -143,7 +155,8 @@ export async function GET(request: NextRequest) {
           issueNumber,
           articles,
           site,
-          unsubscribeUrl(email, site)
+          unsubscribeUrl(email, site),
+          edition
         );
         return {
           from: FROM_EMAIL,
