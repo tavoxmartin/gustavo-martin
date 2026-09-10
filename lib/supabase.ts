@@ -12,6 +12,12 @@ export type ArticleCategory =
   | "Origen"
   | "Radar de Impacto";
 
+export type SiteStats = {
+  // Manually maintained via the Supabase Table Editor. Single row, id = 1.
+  read_rate_percent: number;
+  countries_reached: number;
+};
+
 export type Article = {
   id: string;
   title: string;

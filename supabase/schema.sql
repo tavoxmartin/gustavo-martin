@@ -88,6 +88,26 @@ alter table public.editions enable row level security;
 create policy "Public can read editions" on public.editions
   for select using (true);
 
+-- Single-row table of manually-maintained homepage stats. Gustavo edits the
+-- one row directly in the Supabase Table Editor. The id = 1 check keeps it a
+-- singleton so no second row can be added by accident.
+create table if not exists public.site_stats (
+  id integer primary key default 1,
+  read_rate_percent integer not null default 0,
+  countries_reached integer not null default 0,
+  constraint site_stats_singleton check (id = 1)
+);
+
+alter table public.site_stats enable row level security;
+
+-- Anyone (anon key) can read the stats; only the service role can write.
+create policy "Public can read site_stats" on public.site_stats
+  for select using (true);
+
+insert into public.site_stats (id, read_rate_percent, countries_reached)
+values (1, 62, 8)
+on conflict (id) do nothing;
+
 create table if not exists public.subscribers (
   id uuid primary key default gen_random_uuid(),
   email text not null unique,

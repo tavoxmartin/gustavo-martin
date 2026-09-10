@@ -1,13 +1,25 @@
 import Image from "next/image";
-import { supabase, type Article } from "@/lib/supabase";
+import { supabase, type Article, type SiteStats } from "@/lib/supabase";
 import { SubscribeForm } from "@/app/components/SubscribeForm";
 
-const metrics = [
-  { label: "LECTORES", value: "300" },
-  { label: "LO LEEN", value: "62 %" },
-  { label: "TIEMPO DE LECTURA", value: "7 min", highlight: true },
-  { label: "COMENTARIOS", value: "31" },
-];
+const WORDS_PER_MINUTE = 120;
+
+function wordCount(text: string | null): number {
+  if (!text) return 0;
+  return text.trim().split(/\s+/).filter(Boolean).length;
+}
+
+// Total time to read every article in the latest edition combined, from their
+// summed word count at ~120 words/minute. At least 1 minute whenever that
+// edition has any article.
+function latestEditionReadTimeMinutes(articles: Article[]): number {
+  if (articles.length === 0) return 0;
+  const latestIssue = Math.max(...articles.map((a) => a.issue_number));
+  const totalWords = articles
+    .filter((a) => a.issue_number === latestIssue)
+    .reduce((sum, a) => sum + wordCount(a.content), 0);
+  return Math.max(1, Math.round(totalWords / WORDS_PER_MINUTE));
+}
 
 function formatIssueDate(dateStr: string) {
   return new Intl.DateTimeFormat("es", {
@@ -32,6 +44,16 @@ async function getArticles(): Promise<Article[]> {
   return data;
 }
 
+async function getSiteStats(): Promise<SiteStats | null> {
+  const { data } = await supabase
+    .from("site_stats")
+    .select("read_rate_percent, countries_reached")
+    .eq("id", 1)
+    .maybeSingle();
+
+  return data;
+}
+
 function groupByIssueNumber(issues: Article[]): [number, Article[]][] {
   const groups = new Map<number, Article[]>();
 
@@ -45,7 +67,22 @@ function groupByIssueNumber(issues: Article[]): [number, Article[]][] {
 }
 
 export default async function Home() {
-  const articles = await getArticles();
+  const [articles, siteStats] = await Promise.all([getArticles(), getSiteStats()]);
+
+  const stats = [
+    { label: "ARTÍCULOS", value: String(articles.length) },
+    {
+      label: "TIEMPO DE LECTURA",
+      value: `${latestEditionReadTimeMinutes(articles)} min`,
+      highlight: true,
+    },
+    { label: "LO LEEN", value: `${siteStats?.read_rate_percent ?? 0} %` },
+    {
+      label: "PAÍSES DE ALCANCE",
+      value: String(siteStats?.countries_reached ?? 0),
+    },
+  ];
+
   const newestFirst = [...articles].reverse();
   const [latestIssue, ...previousIssues] = newestFirst;
   const issueGroups = groupByIssueNumber(previousIssues);
@@ -90,6 +127,34 @@ export default async function Home() {
       </section>
 
       <section className="flex w-full flex-col px-6 pb-16 sm:px-12 lg:px-[180px] lg:pb-[88px]">
+        <div className="grid grid-cols-2 gap-[10px] rounded-[20px] bg-[var(--color-card)] p-6 outline outline-[var(--color-border)] -outline-offset-1 sm:grid-cols-4 lg:p-[26px]">
+          {stats.map((m) => (
+            <div
+              key={m.label}
+              className={`flex flex-col gap-[7px] rounded-[12px] p-[16px_18px] ${
+                m.highlight ? "bg-[var(--color-lav)]" : ""
+              }`}
+            >
+              <span
+                className={`font-label text-[11px] leading-[16px] tracking-[2px] ${
+                  m.highlight ? "text-[var(--color-lav-ink)]" : "text-[var(--color-muted)]"
+                }`}
+              >
+                {m.label}
+              </span>
+              <span
+                className={`text-[25px] font-semibold tracking-[-0.8px] whitespace-nowrap ${
+                  m.highlight ? "text-[var(--color-lav-ink)]" : "text-[var(--color-ink)]"
+                }`}
+              >
+                {m.value}
+              </span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="flex w-full flex-col px-6 pb-16 sm:px-12 lg:px-[180px] lg:pb-[88px]">
         <span className="font-label text-[11px] tracking-[2px] text-[var(--color-muted)] sm:whitespace-nowrap">
           EL PRIMER CRACK · SEGUNDO CRACK · DESARROLLO · ORIGEN · RADAR DE IMPACTO
         </span>
@@ -108,33 +173,7 @@ export default async function Home() {
               </span>
             </div>
 
-            <div className="mt-[22px] grid grid-cols-2 gap-[10px] sm:grid-cols-4">
-              {metrics.map((m) => (
-                <div
-                  key={m.label}
-                  className={`flex flex-col gap-[7px] rounded-[12px] p-[16px_18px] ${
-                    m.highlight ? "bg-[var(--color-lav)]" : ""
-                  }`}
-                >
-                  <span
-                    className={`font-label text-[11px] tracking-[2px] whitespace-nowrap ${
-                      m.highlight ? "text-[var(--color-lav-ink)]" : "text-[var(--color-muted)]"
-                    }`}
-                  >
-                    {m.label}
-                  </span>
-                  <span
-                    className={`text-[25px] font-semibold tracking-[-0.8px] whitespace-nowrap ${
-                      m.highlight ? "text-[var(--color-lav-ink)]" : "text-[var(--color-ink)]"
-                    }`}
-                  >
-                    {m.value}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            <span className="font-label mt-[30px] block text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
+            <span className="font-label mt-[26px] block text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
               {latestIssue.category.toUpperCase()}
             </span>
 
