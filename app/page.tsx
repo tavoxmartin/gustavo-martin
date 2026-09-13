@@ -252,7 +252,7 @@ export default async function Home() {
             RECÍBELO COMO UN NEWSLETTER
           </span>
           <h2 className="mt-4 flex flex-wrap items-center gap-x-[9px] text-[24px] leading-[1.2] font-semibold tracking-[-0.9px] sm:text-[31px] sm:leading-[35px]">
-            <span>300 lectores.</span>
+            <span>Señales que cambian el café.</span>
             <span className="opacity-[0.66]">Una vez por semana</span>
           </h2>
           <p className="mt-5 max-w-[600px] text-[17px] leading-[26px] opacity-[0.85]">
