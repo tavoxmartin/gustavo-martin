@@ -91,7 +91,7 @@ export default async function ArticlePage({
 
         <div className="mt-10 flex max-w-[680px] flex-col gap-5 border-t border-[var(--color-border)] pt-10 text-[17px] leading-[28px]">
           {(article.content ?? "")
-            .split(/\n{2,}/)
+            .split(/\r?\n\r?\n+/)
             .filter((paragraph: string) => paragraph.trim().length > 0)
             .map((paragraph: string, i: number) => (
               <p key={i}>{paragraph.trim()}</p>
