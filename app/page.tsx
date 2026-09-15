@@ -220,17 +220,29 @@ export default async function Home() {
                   >
                     <a
                       href={`/articulos/${issue.slug}`}
-                      className="flex flex-1 flex-col gap-[6px]"
+                      className="flex flex-1 gap-4"
                     >
-                      <span className="font-label text-[10px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
-                        {issue.category.toUpperCase()}
-                      </span>
-                      <p className="text-[17px] leading-[23px] font-semibold tracking-[-0.3px]">
-                        {issue.title}
-                      </p>
-                      <p className="text-[16px] leading-[26px] text-[var(--color-muted)]">
-                        {issue.excerpt}
-                      </p>
+                      {issue.cover_image?.trim() && (
+                        // Decorative: the title next to it already names the
+                        // article, so an alt would just repeat it.
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={issue.cover_image.trim()}
+                          alt=""
+                          className="h-[64px] w-[84px] shrink-0 rounded-[10px] object-cover outline outline-[var(--color-border)] -outline-offset-1"
+                        />
+                      )}
+                      <div className="flex flex-1 flex-col gap-[6px]">
+                        <span className="font-label text-[10px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
+                          {issue.category.toUpperCase()}
+                        </span>
+                        <p className="text-[17px] leading-[23px] font-semibold tracking-[-0.3px]">
+                          {issue.title}
+                        </p>
+                        <p className="text-[16px] leading-[26px] text-[var(--color-muted)]">
+                          {issue.excerpt}
+                        </p>
+                      </div>
                     </a>
                     <span className="font-label pt-1 text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)] sm:w-[120px] sm:shrink-0 sm:text-right">
                       {formatIssueDate(issue.date)}

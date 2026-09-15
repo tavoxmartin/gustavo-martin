@@ -15,11 +15,19 @@ function formatIssueDate(dateStr: string) {
 }
 
 async function getArticle(slug: string) {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("articles")
     .select("*")
     .eq("slug", slug)
     .single();
+
+  // PGRST116 = "no rows found", a genuine 404. Any other error (network
+  // blip, timeout, transient 5xx from Supabase) should not be silently
+  // treated as a missing article — surface it instead of a false 404.
+  if (error && error.code !== "PGRST116") {
+    console.error(`Failed to fetch article "${slug}":`, error);
+    throw new Error(`Failed to fetch article "${slug}": ${error.message}`);
+  }
 
   return data;
 }
@@ -49,6 +57,10 @@ export default async function ArticlePage({
   const article = await getArticle(slug);
 
   if (!article) notFound();
+
+  // Treat a blank cover_image the same as a missing one, so an empty cell in
+  // the Supabase Table Editor renders nothing instead of a broken image.
+  const coverImage = article.cover_image?.trim();
 
   return (
     <div className="mx-auto flex w-full max-w-[1440px] flex-col overflow-hidden">
@@ -87,6 +99,23 @@ export default async function ArticlePage({
           <p className="mt-[22px] max-w-[620px] text-[17px] leading-[26px] text-[var(--color-muted)]">
             {article.excerpt}
           </p>
+        )}
+
+        {coverImage && (
+          <figure className="mt-9 max-w-[905px]">
+            {/* Decorative: the headline above carries the meaning and the
+                caption credits the photographer, so an alt would only
+                repeat one of them. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={coverImage}
+              alt=""
+              className="max-h-[260px] w-full rounded-[20px] object-cover outline outline-[var(--color-border)] -outline-offset-1 sm:max-h-[420px]"
+            />
+            <figcaption className="font-label mt-3 text-[11px] tracking-[1px] text-[var(--color-muted)]">
+              Foto: Ruggero Ramirez
+            </figcaption>
+          </figure>
         )}
 
         <div className="mt-10 flex max-w-[680px] flex-col gap-5 border-t border-[var(--color-border)] pt-10 text-[17px] leading-[28px]">

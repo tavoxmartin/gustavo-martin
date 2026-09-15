@@ -23,6 +23,8 @@ export type Article = {
   title: string;
   excerpt: string | null;
   content: string | null;
+  // Full URL or a path under /public. Null/empty when the article has no cover.
+  cover_image: string | null;
   date: string;
   slug: string;
   category: ArticleCategory;

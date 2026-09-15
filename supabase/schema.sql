@@ -6,6 +6,9 @@ create table if not exists public.articles (
   title text not null,
   excerpt text,
   content text,
+  -- Optional cover image: either a full URL (e.g. a Supabase Storage public
+  -- URL) or a path served from /public. Null or empty means no cover is shown.
+  cover_image text,
   date date not null default current_date,
   slug text not null unique,
   category text not null default 'El Primer Crack'
@@ -21,6 +24,12 @@ create table if not exists public.articles (
 -- Safe to re-run.
 alter table public.articles
   add column if not exists notified boolean not null default false;
+
+-- Migration for databases created before the "cover_image" column existed.
+-- Nullable on purpose: articles without a cover just render without one.
+-- Safe to re-run.
+alter table public.articles
+  add column if not exists cover_image text;
 
 -- Migration for databases that already have the articles table from before
 -- category/issue_number existed (i.e. still carry the old "edition" column).
