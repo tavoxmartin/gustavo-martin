@@ -57,45 +57,58 @@ export default function ContactoPage() {
           ← VOLVER
         </Link>
 
-        <span className="font-label mt-8 text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
-          CONTACTO
-        </span>
+        <div className="mt-8 flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between lg:gap-16">
+          <div className="flex min-w-0 flex-col lg:flex-1">
+            <span className="font-label text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)]">
+              CONTACTO
+            </span>
 
-        <h1 className="mt-[18px] max-w-[905px] text-[32px] leading-[1.12] font-semibold tracking-[-1.1px] sm:text-[42px] sm:leading-[1.1] sm:tracking-[-1.6px]">
-          Hablemos de tu proyecto de café
-        </h1>
+            <h1 className="mt-[18px] max-w-[905px] text-[32px] leading-[1.12] font-semibold tracking-[-1.1px] sm:text-[42px] sm:leading-[1.1] sm:tracking-[-1.6px]">
+              Hablemos de tu proyecto de café
+            </h1>
 
-        <p className="mt-[22px] max-w-[620px] text-[17px] leading-[26px] text-[var(--color-muted)]">
-          Trabajo con proyectos de café en estrategia, posicionamiento y desarrollo de
-          mercado. Escríbeme por correo o encuéntrame en redes.
-        </p>
+            <p className="mt-[22px] max-w-[620px] text-[17px] leading-[26px] text-[var(--color-muted)]">
+              Trabajo con proyectos de café en estrategia, posicionamiento y desarrollo de
+              mercado. Escríbeme por correo o encuéntrame en redes.
+            </p>
 
-        <ul className="mt-10 flex max-w-[680px] flex-col border-t border-[var(--color-border)]">
-          {channels.map((channel) => (
-            <li key={channel.label}>
-              <a
-                href={channel.href}
-                {...(channel.external
-                  ? { target: "_blank", rel: "noopener noreferrer" }
-                  : {})}
-                className="group flex flex-col gap-2 border-b border-[var(--color-border)] py-[22px] sm:flex-row sm:items-baseline sm:justify-between sm:gap-10"
-              >
-                <span className="font-label text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)] sm:w-[120px] sm:shrink-0">
-                  {channel.label}
-                </span>
-                <span className="flex-1 text-[19px] leading-[26px] font-semibold tracking-[-0.4px] group-hover:underline">
-                  {channel.value}
-                </span>
-                <span
-                  aria-hidden
-                  className="font-label text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)] group-hover:text-[var(--color-ink)]"
-                >
-                  {channel.external ? "↗" : "→"}
-                </span>
-              </a>
-            </li>
-          ))}
-        </ul>
+            <ul className="mt-10 flex max-w-[680px] flex-col border-t border-[var(--color-border)]">
+              {channels.map((channel) => (
+                <li key={channel.label}>
+                  <a
+                    href={channel.href}
+                    {...(channel.external
+                      ? { target: "_blank", rel: "noopener noreferrer" }
+                      : {})}
+                    className="group flex flex-col gap-2 border-b border-[var(--color-border)] py-[22px] sm:flex-row sm:items-baseline sm:justify-between sm:gap-10"
+                  >
+                    <span className="font-label text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)] sm:w-[120px] sm:shrink-0">
+                      {channel.label}
+                    </span>
+                    <span className="flex-1 text-[19px] leading-[26px] font-semibold tracking-[-0.4px] group-hover:underline">
+                      {channel.value}
+                    </span>
+                    <span
+                      aria-hidden
+                      className="font-label text-[11px] tracking-[2px] whitespace-nowrap text-[var(--color-muted)] group-hover:text-[var(--color-ink)]"
+                    >
+                      {channel.external ? "↗" : "→"}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <Image
+            src="/images/Gustavo-speaker.jpg"
+            alt="Gustavo Martin hablando en un evento"
+            width={2389}
+            height={3583}
+            sizes="(min-width: 1024px) 340px, (min-width: 640px) 420px, 100vw"
+            className="h-auto w-full max-w-[420px] rounded-[20px] object-cover outline outline-[var(--color-border)] -outline-offset-1 lg:w-[340px] lg:shrink-0"
+          />
+        </div>
       </section>
 
       <footer className="flex w-full flex-col gap-10 border-t border-[var(--color-border)] px-6 py-10 sm:px-12 lg:flex-row lg:justify-between lg:px-[180px] lg:py-[30px] lg:pb-[44px]">
