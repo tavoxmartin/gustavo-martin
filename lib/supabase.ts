@@ -25,6 +25,8 @@ export type Article = {
   content: string | null;
   // Full URL or a path under /public. Null/empty when the article has no cover.
   cover_image: string | null;
+  // Photographer shown as "Foto: …" under the cover. Null/empty hides the caption.
+  cover_image_credit: string | null;
   date: string;
   slug: string;
   category: ArticleCategory;

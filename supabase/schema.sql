@@ -9,6 +9,9 @@ create table if not exists public.articles (
   -- Optional cover image: either a full URL (e.g. a Supabase Storage public
   -- URL) or a path served from /public. Null or empty means no cover is shown.
   cover_image text,
+  -- Optional photographer credit shown as "Foto: <credit>" under the cover.
+  -- Null or empty hides the caption.
+  cover_image_credit text,
   date date not null default current_date,
   slug text not null unique,
   category text not null default 'El Primer Crack'
@@ -30,6 +33,12 @@ alter table public.articles
 -- Safe to re-run.
 alter table public.articles
   add column if not exists cover_image text;
+
+-- Migration for databases created before the "cover_image_credit" column
+-- existed. Nullable on purpose: no credit just hides the caption.
+-- Safe to re-run.
+alter table public.articles
+  add column if not exists cover_image_credit text;
 
 -- Migration for databases that already have the articles table from before
 -- category/issue_number existed (i.e. still carry the old "edition" column).

@@ -61,6 +61,7 @@ export default async function ArticlePage({
   // Treat a blank cover_image the same as a missing one, so an empty cell in
   // the Supabase Table Editor renders nothing instead of a broken image.
   const coverImage = article.cover_image?.trim();
+  const coverImageCredit = article.cover_image_credit?.trim();
 
   return (
     <div className="mx-auto flex w-full max-w-[1440px] flex-col overflow-hidden">
@@ -112,9 +113,11 @@ export default async function ArticlePage({
               alt=""
               className="max-h-[260px] w-full rounded-[20px] object-cover outline outline-[var(--color-border)] -outline-offset-1 sm:max-h-[420px]"
             />
-            <figcaption className="font-label mt-3 text-[11px] tracking-[1px] text-[var(--color-muted)]">
-              Foto: Ruggero Ramirez
-            </figcaption>
+            {coverImageCredit && (
+              <figcaption className="font-label mt-3 text-[11px] tracking-[1px] text-[var(--color-muted)]">
+                Foto: {coverImageCredit}
+              </figcaption>
+            )}
           </figure>
         )}
 
