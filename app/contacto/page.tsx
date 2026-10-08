@@ -113,9 +113,13 @@ export default function ContactoPage() {
 
       <footer className="flex w-full flex-col gap-10 border-t border-[var(--color-border)] px-6 py-10 sm:px-12 lg:flex-row lg:justify-between lg:px-[180px] lg:py-[30px] lg:pb-[44px]">
         <div className="flex w-full flex-col gap-[10px] lg:w-[400px] lg:shrink-0">
-          <span className="text-[17px] font-semibold tracking-[-0.5px] whitespace-nowrap">
-            Gustavo Martin
-          </span>
+          <Image
+            src="/hero-icon.jpg"
+            alt="Gustavo Martin"
+            width={128}
+            height={128}
+            className="h-auto max-w-full self-start"
+          />
           <p className="text-[15px] leading-[23px] text-[var(--color-muted)]">
             Trabajo con proyectos de café en estrategia, posicionamiento y desarrollo de
             mercado.

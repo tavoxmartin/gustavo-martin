@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
@@ -66,11 +67,13 @@ export default async function ArticlePage({
   return (
     <div className="mx-auto flex w-full max-w-[1440px] flex-col overflow-hidden">
       <header className="flex w-full items-center justify-between px-6 py-6 sm:px-12 lg:px-[180px] lg:py-[26px]">
-        <Link
-          href="/"
-          className="text-[17px] font-semibold tracking-[-0.5px] whitespace-nowrap"
-        >
-          gustavo martin
+        <Link href="/" className="shrink-0">
+          <Image
+            src="/hero-icon.jpg"
+            alt="Gustavo Martin"
+            width={256}
+            height={256}
+          />
         </Link>
         <Link
           href="/#suscribirte"
@@ -92,18 +95,18 @@ export default async function ArticlePage({
           {formatIssueDate(article.date)}
         </span>
 
-        <h1 className="mt-[18px] max-w-[905px] text-[32px] leading-[1.12] font-semibold tracking-[-1.1px] sm:text-[42px] sm:leading-[1.1] sm:tracking-[-1.6px]">
+        <h1 className="mt-[18px] w-full max-w-[800px] text-[32px] leading-[1.12] font-semibold tracking-[-1.1px] sm:text-[42px] sm:leading-[1.1] sm:tracking-[-1.6px]">
           {article.title}
         </h1>
 
         {article.excerpt && (
-          <p className="mt-[22px] max-w-[620px] text-[17px] leading-[26px] text-[var(--color-muted)]">
+          <p className="mt-[22px] w-full max-w-[800px] text-[17px] leading-[26px] text-[var(--color-muted)]">
             {article.excerpt}
           </p>
         )}
 
         {coverImage && (
-          <figure className="mt-9 max-w-[905px]">
+          <figure className="mt-9 w-full max-w-[800px]">
             {/* Decorative: the headline above carries the meaning and the
                 caption credits the photographer, so an alt would only
                 repeat one of them. */}
@@ -121,7 +124,7 @@ export default async function ArticlePage({
           </figure>
         )}
 
-        <div className="mt-10 flex max-w-[680px] flex-col gap-5 border-t border-[var(--color-border)] pt-10 text-[17px] leading-[28px]">
+        <div className="mt-10 flex w-full max-w-[800px] flex-col gap-5 border-t border-[var(--color-border)] pt-10 text-[17px] leading-[28px]">
           {(article.content ?? "")
             .split(/\r?\n\r?\n+/)
             .filter((paragraph: string) => paragraph.trim().length > 0)
@@ -133,9 +136,13 @@ export default async function ArticlePage({
 
       <footer className="flex w-full flex-col gap-10 border-t border-[var(--color-border)] px-6 py-10 sm:px-12 lg:flex-row lg:justify-between lg:px-[180px] lg:py-[30px] lg:pb-[44px]">
         <div className="flex w-full flex-col gap-[10px] lg:w-[400px] lg:shrink-0">
-          <span className="text-[17px] font-semibold tracking-[-0.5px] whitespace-nowrap">
-            Gustavo Martin
-          </span>
+          <Image
+            src="/hero-icon.jpg"
+            alt="Gustavo Martin"
+            width={128}
+            height={128}
+            className="h-auto max-w-full self-start"
+          />
           <p className="text-[15px] leading-[23px] text-[var(--color-muted)]">
             Trabajo con proyectos de café en estrategia, posicionamiento y desarrollo de
             mercado.
